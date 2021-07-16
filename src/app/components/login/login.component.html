@@ -1,1 +1,30 @@
-<p>login works!</p>
+<div class="login-page--container">
+    <div class="login-page--card-wrapper">
+        <div class="login-page--card">
+            <div class="login-page--form">
+                <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-page--form-controls">
+                    <div class="mat-headline">(C:) Drive</div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input formControlName="email" type="email" matInput>
+                        <mat-error *ngIf="loginForm.controls.email.invalid">
+                            Invalid email format!
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Password</mat-label>
+                        <input formControlName="password" [type]="visibility?'text':'password'" matInput>
+                        <mat-icon (click)="visibility=!visibility" matSuffix>
+                            {{ visibility?'visibility':'visibility_off'}}
+                        </mat-icon>
+                        <mat-error *ngIf="loginForm.controls.password.invalid">
+                            Password can contain special characters, letters and numbers only!
+                        </mat-error>
+                    </mat-form-field>
+                    <button type="submit" mat-stroked-button>Login</button>
+                    <button disabled type="button" mat-button>Reset Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

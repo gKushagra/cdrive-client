@@ -1,1 +1,39 @@
-<p>admin works!</p>
+<div class="admin-page--container">
+    <div class="admin-page--table-wrapper">
+        <div class="admin-page--table">
+            <table mat-table [dataSource]="tableViewDataSrc" class="mat-elevation-z0">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> Name </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.name }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef> Email </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.email }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="joinDate">
+                    <th mat-header-cell *matHeaderCellDef> Joined On </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.joinDate }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button>
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button>
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="tableViewColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: tableViewColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,1 +1,131 @@
-<p>drive works!</p>
+<div class="drive-page--container">
+    <!-- navigation -->
+    <div class="drive-page--header">
+        <mat-toolbar>
+            <span class="mat-title">C:</span>
+            <span class="mat-title">/ home</span>
+            <span class="mat-title">/ pictures</span>
+            <span fxFlex></span>
+            <button *ngIf="isAdmin" (click)="redirectToAdminPanel()" mat-button>
+                Admin Panel
+            </button>
+            <button mat-button>
+                Settings
+            </button>
+            <button (click)="logout()" mat-icon-button>
+                <mat-icon>logout</mat-icon>
+            </button>
+        </mat-toolbar>
+    </div>
+    <!-- actions -->
+    <div class="drive-page--subheader">
+        <div class="drive-page--subheader-wrapper">
+            <button (click)="addFolder()" matTooltip="Add New Folder Here" mat-icon-button>
+                <mat-icon>add_box</mat-icon>
+            </button>
+            <button (click)="uploadFile()" matTooltip="Upload File to this Folder" mat-icon-button>
+                <mat-icon>file_upload</mat-icon>
+            </button>
+            <span fxFlex></span>
+            <button *ngIf="showFileActions" (click)="downloadFile()" matTooltip="Download this File" mat-icon-button>
+                <mat-icon>file_download</mat-icon>
+            </button>
+            <button *ngIf="showFileActions" (click)="renameFile()" matTooltip="Rename this File" mat-icon-button>
+                <mat-icon>drive_file_rename_outline</mat-icon>
+            </button>
+            <button *ngIf="showFileActions" (click)="deleteFile()" matTooltip="Delete this File" mat-icon-button>
+                <mat-icon>delete</mat-icon>
+            </button>
+            <span fxFlex="2"></span>
+            <button (click)="isGrid=!isGrid;currentlySelectedFile=null;showFileActions=false;"
+                [matTooltip]="isGrid?'List View':'Grid View'" mat-icon-button>
+                <mat-icon>{{ isGrid?'view_list':'grid_view' }}</mat-icon>
+            </button>
+        </div>
+    </div>
+    <!-- folders and files -->
+    <div class="drive-page--body">
+        <!-- grid view -->
+        <div class="drive-page--body__grid-view" *ngIf="isGrid">
+            <div (click)="selectFile(item)" *ngFor="let item of currentPageFiles"
+                class="drive-page--body__grid-view-box"
+                [ngClass]="currentlySelectedFile===item?'active':(item.type===fileTypes.DIRECTORY?'directory':'')">
+                <div class="drive-page--body__grid-view-box-thumb">
+                    <!-- different images based on file type -->
+                    <i *ngIf="item.type===fileTypes.IMAGE" class="bi bi-file-earmark-image-fill"></i>
+                    <i *ngIf="item.type===fileTypes.VIDEO" class="bi bi-file-earmark-play-fill"></i>
+                    <i *ngIf="item.type===fileTypes.AUDIO" class="bi bi-file-earmark-music-fill"></i>
+                    <i *ngIf="item.type===fileTypes.TEXT" class="bi bi-file-earmark-text-fill"></i>
+                    <i *ngIf="item.type===fileTypes.PDF" class="bi bi-file-earmark-pdf-fill"></i>
+                    <i *ngIf="item.type===fileTypes.ZIP" class="bi bi-file-earmark-zip-fill"></i>
+                    <i *ngIf="item.type===fileTypes.RAR" class="bi bi-file-earmark-zip-fill"></i>
+                    <i *ngIf="item.type===fileTypes.RTF" class="bi bi-file-earmark-richtext-fill"></i>
+                    <i *ngIf="item.type===fileTypes.WORD" class="bi bi-file-earmark-word-fill"></i>
+                    <i *ngIf="item.type===fileTypes.EXCEL" class="bi bi-file-earmark-spreadsheet-fill"></i>
+                    <i *ngIf="item.type===fileTypes.PPT" class="bi bi-file-earmark-ppt-fill"></i>
+                    <i *ngIf="item.type===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
+                </div>
+                <div class="drive-page--body__grid-view-box-details">
+                    {{ item.name + (!item.extension ? '':item.extension) }}
+                </div>
+            </div>
+        </div>
+        <!-- table view -->
+        <div class="drive-page--body__table-view" *ngIf="!isGrid">
+            <table mat-table [dataSource]="currentPageFiles" class="mat-elevation-z0">
+                <ng-container matColumnDef="fileName">
+                    <th mat-header-cell *matHeaderCellDef> File name </th>
+                    <td mat-cell *matCellDef="let element"
+                        [ngClass]="currentlySelectedFile===element?'active':(element.type===fileTypes.DIRECTORY?'directory-row':'')"
+                        (click)="selectFile(element)">
+                        <span class="table-view--row">
+                            <span class="table-view--file-icon">
+                                <!-- different images based on file type -->
+                                <i *ngIf="element.type===fileTypes.IMAGE" class="bi bi-file-earmark-image-fill"></i>
+                                <i *ngIf="element.type===fileTypes.VIDEO" class="bi bi-file-earmark-play-fill"></i>
+                                <i *ngIf="element.type===fileTypes.AUDIO" class="bi bi-file-earmark-music-fill"></i>
+                                <i *ngIf="element.type===fileTypes.TEXT" class="bi bi-file-earmark-text-fill"></i>
+                                <i *ngIf="element.type===fileTypes.PDF" class="bi bi-file-earmark-pdf-fill"></i>
+                                <i *ngIf="element.type===fileTypes.ZIP" class="bi bi-file-earmark-zip-fill"></i>
+                                <i *ngIf="element.type===fileTypes.RAR" class="bi bi-file-earmark-zip-fill"></i>
+                                <i *ngIf="element.type===fileTypes.RTF" class="bi bi-file-earmark-richtext-fill"></i>
+                                <i *ngIf="element.type===fileTypes.WORD" class="bi bi-file-earmark-word-fill"></i>
+                                <i *ngIf="element.type===fileTypes.EXCEL" class="bi bi-file-earmark-spreadsheet-fill"></i>
+                                <i *ngIf="element.type===fileTypes.PPT" class="bi bi-file-earmark-ppt-fill"></i>
+                                <i *ngIf="element.type===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
+                            </span>
+                            <span>
+                                {{ element.name + (!element.extension ? '':element.extension) }}
+                            </span>
+                        </span>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="dateModified">
+                    <th mat-header-cell *matHeaderCellDef> Last Modified </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="currentlySelectedFile===element?'active-row':null"
+                        (click)="selectFile(element)">
+                        {{ element.dateModified }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="fileSize">
+                    <th mat-header-cell *matHeaderCellDef> File size </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="currentlySelectedFile===element?'active-row':null"
+                        (click)="selectFile(element)">
+                        {{ element.size + ' MB' }}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element"
+                        [ngClass]="currentlySelectedFile===element?'active-row':null">
+                        <mat-checkbox color="primary"></mat-checkbox>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="tableColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: tableColumns;"></tr>
+            </table>
+        </div>
+    </div>
+    <!-- footer -->
+    <div class="drive-page--footer"></div>
+</div>

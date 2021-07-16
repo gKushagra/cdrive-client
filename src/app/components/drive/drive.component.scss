@@ -1,0 +1,294 @@
+.drive-page {
+  &--container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    background-color: #fafafa;
+  }
+
+  &--header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  &--header mat-toolbar {
+    width: 100%;
+    background-color: #64b5f6;
+  }
+
+  &--header mat-toolbar span {
+    margin: 0 3px 0 3px !important;
+  }
+
+  &--subheader {
+    width: 100%;
+    background-color: #e3f2fd;
+  }
+
+  &--subheader-wrapper {
+    margin: 0.1% 2% 0.1% 2%;
+    padding: 0.1% 1% 0.1% 1%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &--body {
+    width: 96%;
+    height: 80%;
+    overflow: auto !important;
+    margin: 1%;
+    padding: 1%;
+  }
+
+  &--body__table-view table {
+    width: 100%;
+  }
+
+  &--body__grid-view {
+    width: 94%;
+    margin: 1% 0.5% 1% 0.5%;
+    padding: 1% 0.5% 1% 0.5%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  &--body__grid-view-box {
+    width: 11%;
+    height: 135px;
+    margin: 1%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+      rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    background-color: #ffffff;
+  }
+
+  &--body__grid-view-box:hover {
+    // border: 2px solid #2962ff;
+    background-color: #e3f2fd;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    cursor: pointer;
+    transition: 0.25s;
+  }
+
+  &--body__grid-view-box-thumb {
+    width: 100%;
+    height: 96px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &--body__grid-view-box-thumb img {
+    width: 56px;
+    background-size: contain;
+  }
+
+  &--body__grid-view-box-thumb .bi-file-earmark-image-fill,
+  &--body__grid-view-box-thumb .bi-file-earmark-music-fill {
+    font-size: 56px;
+    color: #7cb342;
+  }
+  &--body__grid-view-box-thumb .bi-file-earmark-play-fill,
+  &--body__grid-view-box-thumb .bi-file-earmark-pdf-fill,
+  &--body__grid-view-box-thumb .bi-file-earmark-ppt-fill {
+    font-size: 56px;
+    color: #bf360c;
+  }
+  &--body__grid-view-box-thumb .bi-file-earmark-text-fill,
+  &--body__grid-view-box-thumb .bi-file-earmark-richtext-fill,
+  &--body__grid-view-box-thumb .bi-file-earmark-word-fill {
+    font-size: 56px;
+    color: #2962ff;
+  }
+  &--body__grid-view-box-thumb .bi-file-earmark-zip-fill {
+    font-size: 56px;
+    color: #ffd600;
+  }
+  &--body__grid-view-box-thumb .bi-file-earmark-spreadsheet-fill {
+    font-size: 56px;
+    color: #1b5e20;
+  }
+  &--body__grid-view-box-thumb .bi-folder-fill {
+    font-size: 56px;
+    color: #ffab00;
+  }
+
+  &--body__grid-view-box-details {
+    width: 100%;
+    height: 39px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    color: #212121;
+  }
+
+  &--footer {
+    width: 100%;
+  }
+}
+
+.table-view--row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.table-view--row .table-view--file-icon {
+  margin-right: 16px;
+}
+
+.table-view--file-icon .bi-file-earmark-image-fill,
+.table-view--file-icon .bi-file-earmark-music-fill {
+  font-size: 40px;
+  color: #7cb342;
+}
+.table-view--file-icon .bi-file-earmark-play-fill,
+.table-view--file-icon .bi-file-earmark-pdf-fill,
+.table-view--file-icon .bi-file-earmark-ppt-fill {
+  font-size: 40px;
+  color: #bf360c;
+}
+.table-view--file-icon .bi-file-earmark-zip-fill {
+  font-size: 40px;
+  color: #ffd600;
+}
+.table-view--file-icon .bi-file-earmark-richtext-fill,
+.table-view--file-icon .bi-file-earmark-text-fill,
+.table-view--file-icon .bi-file-earmark-word-fill {
+  font-size: 40px;
+  color: #2962ff;
+}
+.table-view--file-icon .bi-file-earmark-spreadsheet-fill {
+  font-size: 40px;
+  color: #1b5e20;
+}
+.table-view--file-icon .bi-folder-fill {
+  font-size: 48px;
+  color: #ffab00;
+}
+
+.mat-column-fileName {
+  font-size: 17px !important;
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 65% !important;
+  width: 65% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-dateModified {
+  font-size: 17px !important;
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-fileSize {
+  font-size: 17px !important;
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-select {
+  font-size: 17px !important;
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 5% !important;
+  width: 5% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-row:hover {
+  background-color: #e3f2fd;
+  cursor: pointer;
+}
+
+.active {
+  background-color: #e3f2fd;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  transition: 0.25s;
+}
+
+.active-row {
+  background-color: #e3f2fd;
+  transition: 0.25s;
+}
+
+// .directory {
+//   border-color: #FFAB00;
+// }
+
+// .directory .drive-page--body__grid-view-box-details {
+//   color: #212121;
+//   font-weight: bold;
+// }
+
+// .directory-row {
+//   color: #212121;
+// }
