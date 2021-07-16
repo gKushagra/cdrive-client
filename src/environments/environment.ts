@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  cdrive_api: "http://localhost:7997/",
+  cdrive_api2: "http://localhost:12323/"
 };
 
 /*

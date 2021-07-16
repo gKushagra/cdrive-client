@@ -4,8 +4,6 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from './material.module';
-import { FlexLayoutModule } from "@angular/flex-layout";
 
 import { ComponentsModule } from "./components/component.module";
 
@@ -17,8 +15,6 @@ import { ComponentsModule } from "./components/component.module";
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MaterialModule, // remove if not needed in app component
-    FlexLayoutModule, // remove if not needed in app component
     ComponentsModule
   ],
   providers: [],
