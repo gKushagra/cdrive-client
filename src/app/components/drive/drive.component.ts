@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { DriveService, FILE_MIME_TYPES } from "../../services/drive.service";
+import { ActionsDialogComponent, ACTION_DIALOG_TYPES } from '../actions-dialog/actions-dialog.component';
 
 @Component({
   selector: 'app-drive',
@@ -35,6 +37,7 @@ export class DriveComponent implements OnInit {
     private router: Router,
     private adminService: AdminService,
     private driveService: DriveService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -73,6 +76,18 @@ export class DriveComponent implements OnInit {
   downloadFile() { }
   renameFile() { }
   deleteFile() { }
+
+  openSettings() {
+    let dialogConfig: MatDialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.maxHeight = window.innerHeight / 2 + 100;
+    dialogConfig.maxWidth = window.innerWidth / 3;
+    dialogConfig.data = {
+      dialogAction: ACTION_DIALOG_TYPES['edit-user'],
+      user: this.adminService.user
+    }
+    this.dialog.open(ActionsDialogComponent, dialogConfig);
+  }
 
   redirectToAdminPanel() {
     this.router.navigate(['admin']);

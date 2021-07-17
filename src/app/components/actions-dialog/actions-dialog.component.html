@@ -1,1 +1,46 @@
-<p>actions-dialog works!</p>
+<div class="actions-dialog--container">
+    <div class="actions-dialog--wrapper">
+        <div class="actions-dialog--form">
+            <!-- add/edit contact -->
+            <form *ngIf="currentAction===dialogActions['add-user']||currentAction===dialogActions['edit-user']"
+                [formGroup]="userForm" (ngSubmit)="userAddEdit()">
+                <div class="mat-headline">
+                    {{ currentAction===dialogActions['add-user']?'Add New User':'Edit User' }}
+                </div>
+                <mat-form-field color="primary">
+                    <mat-label>Name</mat-label>
+                    <input formControlName="name" type="text" required matInput>
+                    <mat-error *ngIf="userForm.controls.name.invalid">Name is required.</mat-error>
+                </mat-form-field>
+                <mat-form-field color="primary">
+                    <mat-label>Email</mat-label>
+                    <input formControlName="email" type="email" required matInput>
+                    <mat-error *ngIf="userForm.controls.email.invalid">Email is required.</mat-error>
+                </mat-form-field>
+                <mat-form-field *ngIf="currentAction===dialogActions['add-user']" color="primary">
+                    <mat-label>Initial Password</mat-label>
+                    <input formControlName="password" type="text" required matInput>
+                    <mat-error *ngIf="userForm.controls.password.invalid">Initial password is required.</mat-error>
+                </mat-form-field>
+                <div>
+                    <mat-checkbox formControlName="admin" color="primary">Grant Admin Privileges?</mat-checkbox>
+                </div>
+                <div>
+                    <button type="submit" mat-stroked-button>Save</button>
+                    <button type="button" (click)="dialogRef.close()" mat-stroked-button>Cancel</button>
+                </div>
+            </form>
+            <!-- confirmation -->
+            <div *ngIf="currentAction===dialogActions['confirmation']">
+                <div class="mat-headline">
+                    Confirmation
+                </div>
+                <div class="mat-subheading-1">
+                    Remove {{ data.user.name }}?
+                </div>
+                <button type="button" (click)="deleteUser()" mat-stroked-button>Confirm</button>
+                <button type="button" (click)="dialogRef.close()" mat-stroked-button>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

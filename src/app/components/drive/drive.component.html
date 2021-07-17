@@ -2,14 +2,14 @@
     <!-- navigation -->
     <div class="drive-page--header">
         <mat-toolbar>
-            <span class="mat-title">C:</span>
+            <span class="mat-title">D:</span>
             <span class="mat-title">/ home</span>
             <span class="mat-title">/ pictures</span>
             <span fxFlex></span>
             <button *ngIf="isAdmin" (click)="redirectToAdminPanel()" mat-button>
                 Admin Panel
             </button>
-            <button mat-button>
+            <button (click)="openSettings()" mat-button>
                 Settings
             </button>
             <button (click)="logout()" mat-icon-button>

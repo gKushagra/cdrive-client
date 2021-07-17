@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,9 @@ export class AdminService {
 
   user: User;
   users: User[] = [];
+
+  refreshUsers: Subject<boolean> = new Subject();
+  refreshUsersObsrv: Observable<boolean> = this.refreshUsers.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -30,6 +34,18 @@ export class AdminService {
 
   getAllUsers() {
     return this.http.get(this.adminUrl + 'user');
+  }
+
+  addUser(payload) {
+    return this.http.post(this.adminUrl + 'user', payload);
+  }
+
+  updateUser(payload) {
+    return this.http.put(this.adminUrl + 'user', payload);
+  }
+
+  deleteUser(id) {
+    return this.http.delete(this.adminUrl + `user/${id}`);
   }
 }
 
