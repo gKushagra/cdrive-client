@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  cdrive_api: "http://localhost:7997/",
-  cdrive_api2: "http://localhost:12323/"
+  cdrive_api: "https://api.admin.cdrive.opensourced.in/",
+  cdrive_api2: "http://localhost:7997/"
 };
 
 /*

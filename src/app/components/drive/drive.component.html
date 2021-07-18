@@ -2,9 +2,6 @@
     <!-- navigation -->
     <div class="drive-page--header">
         <mat-toolbar>
-            <span class="mat-title">D:</span>
-            <span class="mat-title">/ home</span>
-            <span class="mat-title">/ pictures</span>
             <span fxFlex></span>
             <button *ngIf="isAdmin" (click)="redirectToAdminPanel()" mat-button>
                 Admin Panel
@@ -20,20 +17,25 @@
     <!-- actions -->
     <div class="drive-page--subheader">
         <div class="drive-page--subheader-wrapper">
-            <button (click)="addFolder()" matTooltip="Add New Folder Here" mat-icon-button>
-                <mat-icon>add_box</mat-icon>
+            <button (click)="openFileActionsDialog(fileActions.add_directory)" matTooltip="Add New Folder Here"
+                mat-icon-button>
+                <mat-icon>create_new_folder</mat-icon>
             </button>
-            <button (click)="uploadFile()" matTooltip="Upload File to this Folder" mat-icon-button>
+            <button (click)="openFileActionsDialog(fileActions.add_file)" matTooltip="Upload File to this Folder"
+                mat-icon-button>
                 <mat-icon>file_upload</mat-icon>
             </button>
             <span fxFlex></span>
-            <button *ngIf="showFileActions" (click)="downloadFile()" matTooltip="Download this File" mat-icon-button>
+            <button *ngIf="showFileActions" (click)="openFileActionsDialog(fileActions.download_file)"
+                matTooltip="Download this File" mat-icon-button>
                 <mat-icon>file_download</mat-icon>
             </button>
-            <button *ngIf="showFileActions" (click)="renameFile()" matTooltip="Rename this File" mat-icon-button>
+            <button *ngIf="showFileActions" (click)="openFileActionsDialog(fileActions.rename_file)"
+                matTooltip="Rename this File" mat-icon-button>
                 <mat-icon>drive_file_rename_outline</mat-icon>
             </button>
-            <button *ngIf="showFileActions" (click)="deleteFile()" matTooltip="Delete this File" mat-icon-button>
+            <button *ngIf="showFileActions" (click)="openFileActionsDialog(fileActions.delete_file)"
+                matTooltip="Delete this File" mat-icon-button>
                 <mat-icon>delete</mat-icon>
             </button>
             <span fxFlex="2"></span>
@@ -43,75 +45,124 @@
             </button>
         </div>
     </div>
+    <div class="drive-page--navigation">
+        <div class="drive-page--navigation-wrapper-link">
+            <span *ngFor="let dir of navigationDirs; let i = index;">
+                <span class="nav-link" (click)="navigateDir(dir)" *ngIf="i===0">D:</span>
+                <span class="nav-separator" *ngIf="i===0">/</span>
+                <span class="nav-link" (click)="navigateDir(dir)" *ngIf="i>0">
+                    {{ dir.file.name }}
+                </span>
+                <span class="nav-separator" *ngIf="i>0&&i<navigationDirs.length-1">/</span>
+            </span>
+        </div>
+    </div>
+    <div *ngIf="currentDirectoryFiles.length===0" class="mat-title">No Files</div>
     <!-- folders and files -->
     <div class="drive-page--body">
         <!-- grid view -->
         <div class="drive-page--body__grid-view" *ngIf="isGrid">
-            <div (click)="selectFile(item)" *ngFor="let item of currentPageFiles"
+            <div (click)="!item.type?selectFolder(item):selectFile(item)" *ngFor="let item of currentDirectoryFiles"
                 class="drive-page--body__grid-view-box"
                 [ngClass]="currentlySelectedFile===item?'active':(item.type===fileTypes.DIRECTORY?'directory':'')">
                 <div class="drive-page--body__grid-view-box-thumb">
                     <!-- different images based on file type -->
-                    <i *ngIf="item.type===fileTypes.IMAGE" class="bi bi-file-earmark-image-fill"></i>
-                    <i *ngIf="item.type===fileTypes.VIDEO" class="bi bi-file-earmark-play-fill"></i>
-                    <i *ngIf="item.type===fileTypes.AUDIO" class="bi bi-file-earmark-music-fill"></i>
-                    <i *ngIf="item.type===fileTypes.TEXT" class="bi bi-file-earmark-text-fill"></i>
-                    <i *ngIf="item.type===fileTypes.PDF" class="bi bi-file-earmark-pdf-fill"></i>
-                    <i *ngIf="item.type===fileTypes.ZIP" class="bi bi-file-earmark-zip-fill"></i>
-                    <i *ngIf="item.type===fileTypes.RAR" class="bi bi-file-earmark-zip-fill"></i>
-                    <i *ngIf="item.type===fileTypes.RTF" class="bi bi-file-earmark-richtext-fill"></i>
-                    <i *ngIf="item.type===fileTypes.WORD" class="bi bi-file-earmark-word-fill"></i>
-                    <i *ngIf="item.type===fileTypes.EXCEL" class="bi bi-file-earmark-spreadsheet-fill"></i>
-                    <i *ngIf="item.type===fileTypes.PPT" class="bi bi-file-earmark-ppt-fill"></i>
-                    <i *ngIf="item.type===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.IMAGE" class="bi bi-file-earmark-image-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.VIDEO" class="bi bi-file-earmark-play-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.AUDIO" class="bi bi-file-earmark-music-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.TEXT" class="bi bi-file-earmark-text-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.PDF" class="bi bi-file-earmark-pdf-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.ZIP" class="bi bi-file-earmark-zip-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.RAR" class="bi bi-file-earmark-zip-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.RTF" class="bi bi-file-earmark-richtext-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.WORD" class="bi bi-file-earmark-word-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.EXCEL" class="bi bi-file-earmark-spreadsheet-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.PPT" class="bi bi-file-earmark-ppt-fill"></i>
+                    <i *ngIf="item.generalizedType===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
                 </div>
-                <div class="drive-page--body__grid-view-box-details">
-                    {{ item.name + (!item.extension ? '':item.extension) }}
+                <div [matTooltip]="item.name.length>30?item.name:null" class="drive-page--body__grid-view-box-details">
+                    <span>
+                        <span>
+                            {{ item.name.length>30?((item.name |slice:0:30)+"..."):item.name}}
+                        </span>
+                        <mat-icon matTooltip="Rename Folder" appStopPropogation
+                            (click)="currentlySelectedFolder=item;openFileActionsDialog(fileActions.rename_directory);"
+                            *ngIf="!item.type">
+                            drive_file_rename_outline
+                        </mat-icon>
+                        <mat-icon matTooltip="Delete Folder" appStopPropogation
+                            (click)="currentlySelectedFolder=item;openFileActionsDialog(fileActions.delete_directory);"
+                            *ngIf="!item.type">
+                            delete
+                        </mat-icon>
+                    </span>
                 </div>
             </div>
         </div>
         <!-- table view -->
         <div class="drive-page--body__table-view" *ngIf="!isGrid">
-            <table mat-table [dataSource]="currentPageFiles" class="mat-elevation-z0">
+            <table mat-table [dataSource]="currentDirectoryFiles" class="mat-elevation-z0">
                 <ng-container matColumnDef="fileName">
                     <th mat-header-cell *matHeaderCellDef> File name </th>
                     <td mat-cell *matCellDef="let element"
-                        [ngClass]="currentlySelectedFile===element?'active':(element.type===fileTypes.DIRECTORY?'directory-row':'')"
-                        (click)="selectFile(element)">
+                        [ngClass]="currentlySelectedFile===element?'active':(element.type===fileTypes.DIRECTORY?'directory-row':'')">
                         <span class="table-view--row">
                             <span class="table-view--file-icon">
                                 <!-- different images based on file type -->
-                                <i *ngIf="element.type===fileTypes.IMAGE" class="bi bi-file-earmark-image-fill"></i>
-                                <i *ngIf="element.type===fileTypes.VIDEO" class="bi bi-file-earmark-play-fill"></i>
-                                <i *ngIf="element.type===fileTypes.AUDIO" class="bi bi-file-earmark-music-fill"></i>
-                                <i *ngIf="element.type===fileTypes.TEXT" class="bi bi-file-earmark-text-fill"></i>
-                                <i *ngIf="element.type===fileTypes.PDF" class="bi bi-file-earmark-pdf-fill"></i>
-                                <i *ngIf="element.type===fileTypes.ZIP" class="bi bi-file-earmark-zip-fill"></i>
-                                <i *ngIf="element.type===fileTypes.RAR" class="bi bi-file-earmark-zip-fill"></i>
-                                <i *ngIf="element.type===fileTypes.RTF" class="bi bi-file-earmark-richtext-fill"></i>
-                                <i *ngIf="element.type===fileTypes.WORD" class="bi bi-file-earmark-word-fill"></i>
-                                <i *ngIf="element.type===fileTypes.EXCEL" class="bi bi-file-earmark-spreadsheet-fill"></i>
-                                <i *ngIf="element.type===fileTypes.PPT" class="bi bi-file-earmark-ppt-fill"></i>
-                                <i *ngIf="element.type===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.IMAGE"
+                                    class="bi bi-file-earmark-image-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.VIDEO"
+                                    class="bi bi-file-earmark-play-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.AUDIO"
+                                    class="bi bi-file-earmark-music-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.TEXT"
+                                    class="bi bi-file-earmark-text-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.PDF"
+                                    class="bi bi-file-earmark-pdf-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.ZIP"
+                                    class="bi bi-file-earmark-zip-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.RAR"
+                                    class="bi bi-file-earmark-zip-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.RTF"
+                                    class="bi bi-file-earmark-richtext-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.WORD"
+                                    class="bi bi-file-earmark-word-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.EXCEL"
+                                    class="bi bi-file-earmark-spreadsheet-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.PPT"
+                                    class="bi bi-file-earmark-ppt-fill"></i>
+                                <i *ngIf="element.generalizedType===fileTypes.DIRECTORY" class="bi bi-folder-fill"></i>
                             </span>
-                            <span>
-                                {{ element.name + (!element.extension ? '':element.extension) }}
+                            <span class="nav-link" (click)="!element.type?selectFolder(element):selectFile(element)">
+                                <span>
+                                    <span>{{ element.name }}</span>
+                                    <mat-icon appStopPropogation matTooltip="Rename Folder"
+                                        (click)="currentlySelectedFolder=element;openFileActionsDialog(fileActions.rename_directory);"
+                                        *ngIf="!element.type">
+                                        drive_file_rename_outline
+                                    </mat-icon>
+                                    <mat-icon matTooltip="Delete Folder" appStopPropogation
+                                        (click)="currentlySelectedFolder=element;openFileActionsDialog(fileActions.delete_directory);"
+                                        *ngIf="!element.type">
+                                        delete
+                                    </mat-icon>
+                                </span>
                             </span>
                         </span>
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="dateModified">
                     <th mat-header-cell *matHeaderCellDef> Last Modified </th>
-                    <td mat-cell *matCellDef="let element" [ngClass]="currentlySelectedFile===element?'active-row':null"
-                        (click)="selectFile(element)">
-                        {{ element.dateModified }}
+                    <td mat-cell *matCellDef="let element"
+                        [ngClass]="currentlySelectedFile===element?'active-row':null">
+                        {{ element.lastModified? (element.lastModified |date):'-'}}
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="fileSize">
                     <th mat-header-cell *matHeaderCellDef> File size </th>
-                    <td mat-cell *matCellDef="let element" [ngClass]="currentlySelectedFile===element?'active-row':null"
-                        (click)="selectFile(element)">
-                        {{ element.size + ' MB' }}
+                    <td mat-cell *matCellDef="let element"
+                        [ngClass]="currentlySelectedFile===element?'active-row':null">
+                        {{ element.size? getFileSize(element.size):'-' }}
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="select">

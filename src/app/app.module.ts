@@ -9,10 +9,11 @@ import { ComponentsModule } from "./components/component.module";
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { RequestInterceptor } from "./request.interceptor";
+import { StopPropogationDirective } from './directives/stop-propogation.directive';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

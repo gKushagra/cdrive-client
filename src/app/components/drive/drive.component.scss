@@ -45,12 +45,29 @@
     align-items: center;
   }
 
-  &--body {
+  &--navigation {
     width: 96%;
+    margin: 0.5% 1% 0.5% 1%;
+    padding: 0.5% 1% 0.5% 1%;
+
+    &-wrapper {
+      width: 99.6%;
+      margin: 0.1%;
+      padding: 0.1%;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+  }
+
+  &--body {
+    width: 99%;
     height: 80%;
     overflow: auto !important;
-    margin: 1%;
-    padding: 1%;
+    margin: 0.25%;
+    padding: 0.25%;
   }
 
   &--body__table-view table {
@@ -141,12 +158,20 @@
   &--body__grid-view-box-details {
     width: 100%;
     height: 39px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
     color: #212121;
+    word-wrap: break-word !important;
+    text-align: center;
+  }
+
+  &--body__grid-view-box-details mat-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 2px;
+    font-size: 16px;
+    color: #616161;
+  }
+  &--body__grid-view-box-details mat-icon:hover {
+    color: #0091ea;
   }
 
   &--footer {
@@ -160,6 +185,17 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
+}
+
+.table-view--row .nav-link mat-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  font-size: 16px;
+  color: #616161;
+}
+.table-view--row .nav-link mat-icon:hover {
+  color: #0091ea;
 }
 
 .table-view--row .table-view--file-icon {
@@ -292,3 +328,22 @@
 // .directory-row {
 //   color: #212121;
 // }
+
+.nav-link {
+  font-size: 18px;
+  font-weight: normal;
+  color: #2196f3;
+  cursor: pointer;
+  margin: 2px;
+  padding: 1px;
+}
+.nav-link:hover {
+  text-decoration: underline;
+}
+.nav-separator {
+  font-size: 20px;
+  font-weight: lighter;
+  color: #212121;
+  margin: 2px;
+  padding: 1px;
+}

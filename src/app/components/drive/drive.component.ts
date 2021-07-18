@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
-import { DriveService, FILE_MIME_TYPES } from "../../services/drive.service";
+import { DriveFile, DriveService, FILE_MIME_TYPES, TreeNode } from "../../services/drive.service";
 import { ActionsDialogComponent, ACTION_DIALOG_TYPES } from '../actions-dialog/actions-dialog.component';
+import { FileActionsComponent, FILE_ACTIONS } from './file-actions/file-actions.component';
 
 @Component({
   selector: 'app-drive',
@@ -13,25 +14,18 @@ import { ActionsDialogComponent, ACTION_DIALOG_TYPES } from '../actions-dialog/a
 export class DriveComponent implements OnInit {
 
   fileTypes = FILE_MIME_TYPES;
+  fileActions = FILE_ACTIONS;
   isAdmin: boolean = false;
   isGrid: boolean = true;
   showFileActions: boolean = false;
   tableColumns: string[] = ['fileName', 'dateModified', 'fileSize', 'select'];
-  currentPageFiles: any = [
-    { type: this.fileTypes.IMAGE, extension: '.jpg', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.VIDEO, extension: '.mp4', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.AUDIO, extension: '.mp3', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.TEXT, extension: '.txt', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.PDF, extension: '.pdf', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.ZIP, extension: '.zip', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.RAR, extension: '.rar', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.RTF, extension: '.rtf', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.WORD, extension: '.docx', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.EXCEL, extension: '.xlsx', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.PPT, extension: '.pptx', name: "sample", dateModified: "July 7, 2020", size: 1.1, path: null, parentDirectory: null },
-    { type: this.fileTypes.DIRECTORY, extension: null, name: "images", dateModified: "July 7, 2020", size: 10.1, path: null, parentDirectory: null },
-  ];
-  currentlySelectedFile: any;
+  currentlySelectedFile: DriveFile;
+  currentlySelectedFolder: DriveFile;
+  directoryTree: TreeNode;
+  currentDirectoryFiles: DriveFile[] = [];
+  getFileSize;
+  getGeneralizedType;
+  navigationDirs: TreeNode[] = [];
 
   constructor(
     private router: Router,
@@ -41,9 +35,11 @@ export class DriveComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.getFileSize = this.driveService.getFileSize;
+    this.getGeneralizedType = this.driveService.getGeneralizedType;
 
     window.addEventListener('load', () => {
-      if (!this.adminService.user)
+      if (!this.adminService.user) {
         this.adminService.refreshToken()
           .subscribe((response: any) => {
             // console.log(response);
@@ -54,28 +50,105 @@ export class DriveComponent implements OnInit {
               localStorage.setItem('token', response.token);
               this.adminService.user = response.user;
               this.isAdmin = this.adminService.user?.admin;
+              this.getDirectoryTree();
             }
           }, (error) => {
             console.log(error);
           }, () => { });
+      }
     });
 
     this.isAdmin = this.adminService.user?.admin;
+    this.adminService.user ? this.getDirectoryTree() : null;
+
+    this.driveService.notifyUploadCompleteObsrv
+      .subscribe(isComplete => {
+        if (isComplete) {
+          this.navigationDirs = [];
+          this.getDirectoryTree();
+        }
+      });
   }
 
-  selectFile(file: any) {
+  getDirectoryTree() {
+    this.driveService.getDirectoryTree(this.adminService.user.userId)
+      .subscribe((response: TreeNode) => {
+        console.log(response);
+        this.directoryTree = response;
+      }, (error) => {
+        console.log(error);
+      }, () => {
+        this.navigationDirs.push(this.directoryTree);
+        this.loadCurrentDirectory();
+      });
+  }
+
+  loadCurrentDirectory() {
+    this.currentDirectoryFiles = this.navigationDirs[this.navigationDirs.length - 1].children.length > 0 ?
+      this.navigationDirs[this.navigationDirs.length - 1].children.map((f: TreeNode) => {
+        return {
+          lastModified: f.file ?
+            new Date(f.file?.lastModified) : null,
+          name: f.file ? f.file.name : f.path.split("/")[f.path.split("/").length - 1],
+          size: f.file ? (f.file.type ? f.file.size : null) : null,
+          type: f.file?.type,
+          path: f.path,
+          generalizedType: f.file ? (f.file.type ?
+            this.getGeneralizedType(f.file.type) :
+            this.fileTypes.DIRECTORY) : null,
+        }
+      }) : [];
+    console.log(this.currentDirectoryFiles);
+  }
+
+  selectFile(file: DriveFile) {
     this.currentlySelectedFile = file;
     this.showFileActions = true;
   }
 
-  /** below method work on current folder */
-  addFolder() { }
-  uploadFile() { }
+  selectFolder(file: DriveFile) {
+    let idx = this.navigationDirs[this.navigationDirs.length - 1].children
+      .findIndex(dir => dir.file.name === file.name);
+    console.log(idx);
+    this.navigationDirs.push(this.navigationDirs[this.navigationDirs.length - 1].children[idx]);
+    console.log(this.navigationDirs);
+    this.loadCurrentDirectory();
+  }
 
-  /** below methods work on currently selected file */
-  downloadFile() { }
-  renameFile() { }
-  deleteFile() { }
+  navigateDir(dir: TreeNode) {
+    if (this.navigationDirs.length === 1) return;
+    if (dir.file?.name ===
+      this.navigationDirs[this.navigationDirs.length - 1].file?.name)
+      return;
+    if (this.navigationDirs.length === 2) {
+      this.navigationDirs.pop();
+      this.loadCurrentDirectory();
+    }
+    if (this.navigationDirs.length > 2) {
+      if (dir.file?.name === this.navigationDirs[this.navigationDirs.length - 2].file?.name) {
+        this.navigationDirs.pop();
+        this.loadCurrentDirectory();
+      }
+    }
+  }
+
+  openFileActionsDialog(fileAction: FILE_ACTIONS) {
+    let dialogConfig: MatDialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.minHeight = window.innerHeight / 3;
+    dialogConfig.minWidth = window.innerWidth / 3;
+    dialogConfig.data = {
+      fileAction: fileAction,
+      data: {
+        currentDirectory: this.navigationDirs[this.navigationDirs.length - 1].path,
+        currentlySelectedFile: this.currentlySelectedFile ?
+          this.currentlySelectedFile : null,
+        currentlySelectedFolder: this.currentlySelectedFolder ?
+          this.currentlySelectedFolder : null,
+      }
+    };
+    this.dialog.open(FileActionsComponent, dialogConfig);
+  }
 
   openSettings() {
     let dialogConfig: MatDialogConfig = new MatDialogConfig();
@@ -97,7 +170,9 @@ export class DriveComponent implements OnInit {
     localStorage.clear();
     this.adminService.user = null;
     this.adminService.users = [];
-    this.currentPageFiles = [];
+    this.currentDirectoryFiles = [];
+    this.currentlySelectedFile = null;
+    this.currentlySelectedFolder = null;
     this.router.navigate(['login']);
   }
 }
