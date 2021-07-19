@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdminService } from 'src/app/services/admin.service';
-import { DriveService, UploadProgress } from 'src/app/services/drive.service';
+import { DownloadProgress, DriveService, UploadProgress } from 'src/app/services/drive.service';
 
 @Component({
   selector: 'app-file-actions',
@@ -15,6 +15,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
   fileSelected: File[] = [];
   fileUploaded: string[] = [];
   isUploading: boolean = false;
+  isDownloading: boolean = false;
   getFileSize;
   addFolderInput: FormControl = new FormControl(null, [Validators.required]);
   renameInput: FormControl = new FormControl(null, [Validators.required]);
@@ -28,7 +29,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
+    // console.log(this.data);
     this.getFileSize = this.driveService.getFileSize;
     this.data.fileAction === this.fileActions.rename_file ?
       this.renameInput.setValue(this.data.data.currentlySelectedFile.name) :
@@ -44,6 +45,28 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       .subscribe((f: File) => {
         if (f) this.checkAllComplete(f);
       });
+
+    this.driveService.downloadProgressObsrv
+      .subscribe((data: DownloadProgress) => {
+        // console.log(data);
+        let progressBarFillEl = document.getElementById('upload-progress-bar-fill');
+        let progressBarDetailEl = document.getElementById('upload-progress-bar-detail');
+        progressBarFillEl.style.width = `${data.percent}%`;
+        progressBarDetailEl.innerText = `${data.percent}%, ${data.kbps?`${data.kbps} KB/s, `:''} ${data.mins?`${data.mins} mins`:''} ${data.secs?`${data.secs} seconds remaining`:''}`;
+      });
+
+    this.driveService.downloadResponseObsrv
+      .subscribe((response: any) => {
+        let linkEl = document.createElement('a');
+        let objUrl = window.URL.createObjectURL(response);
+        linkEl.href = objUrl;
+        linkEl.download = this.data.data.currentlySelectedFile?.name;
+        setTimeout(() => {
+          linkEl.click();
+          this.data = null;
+          this.dialogRef.close();
+        }, 2000);
+      });
   }
 
   ngAfterViewInit() {
@@ -52,17 +75,8 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       fileSelectInput.addEventListener('change', (e) => { this.filesSelected(e) }, false);
     }
 
-    // let progressBarEl = document.getElementById('upload-progress-bar-fill');
-    // let percent = 0;
-    // let progressInterval = setInterval(() => {
-    //   // console.log(percent);
-    //   if (percent === 100) clearInterval(progressInterval);
-    //   if (percent <= 100) {
-    //     progressBarEl.style.width = `${percent}%`;
-    //     progressBarEl.innerText = `${percent}%`;
-    //   }
-    //   percent += 1;
-    // }, 10);
+    if (this.data.fileAction === this.fileActions.download_file)
+      this.downloadFile();
   }
 
   filesSelected(e) {
@@ -109,6 +123,14 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
     // console.log(this.fileSelected);
   }
 
+  downloadFile() {
+    this.isDownloading = true;
+    this.driveService.downloadFile({
+      id: this.adminService.user.userId,
+      filePath: this.data.data.currentlySelectedFile.path
+    });
+  }
+
   renameFile() {
     this.error = null;
     this.driveService.renameFile({
@@ -116,7 +138,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       filePath: this.data.data.currentlySelectedFile.path,
       newName: this.renameInput.value
     }).subscribe((response: any) => {
-      console.log(response);
+      // console.log(response);
     }, (error) => {
       console.log(error);
     }, () => {
@@ -131,7 +153,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       id: this.adminService.user.userId,
       filePath: this.data.data.currentlySelectedFile.path,
     }).subscribe((response: any) => {
-      console.log(response);
+      // console.log(response);
     }, (error) => {
       console.log(error);
     }, () => {
@@ -164,7 +186,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       dirPath: this.data.data.currentlySelectedFolder.path,
       newName: this.renameInput.value
     }).subscribe((response: any) => {
-      console.log(response);
+      // console.log(response);
       if (response === "directory-name-exists") {
         this.error = "Folder with this name already exists";
       }
@@ -184,7 +206,7 @@ export class FileActionsComponent implements OnInit, AfterViewInit {
       id: this.adminService.user.userId,
       dirPath: this.data.data.currentlySelectedFolder.path,
     }).subscribe((response: any) => {
-      console.log(response);
+      // console.log(response);
     }, (error) => {
       console.log(error);
     }, () => {

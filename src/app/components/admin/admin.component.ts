@@ -29,7 +29,7 @@ export class AdminComponent implements OnInit {
   ngOnInit(): void {
 
     window.addEventListener('load', () => {
-      console.log('here');
+      // console.log('here');
       if (!this.adminService.user)
         this.adminService.refreshToken()
           .subscribe((response: any) => {
@@ -66,7 +66,7 @@ export class AdminComponent implements OnInit {
     this.refreshTable = true;
     this.adminService.getAllUsers()
       .subscribe((response: any) => {
-        console.log(response);
+        // console.log(response);
         if (Array.isArray(response))
           this.adminService.users = response;
         else

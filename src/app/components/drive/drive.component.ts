@@ -64,8 +64,19 @@ export class DriveComponent implements OnInit {
     this.driveService.notifyUploadCompleteObsrv
       .subscribe(isComplete => {
         if (isComplete) {
-          this.navigationDirs = [];
-          this.getDirectoryTree();
+          this.showFileActions = false;
+          this.currentlySelectedFile = null;
+          this.currentlySelectedFolder = null;
+          this.currentDirectoryFiles = [];
+          this.driveService.getDirectoryTree(this.adminService.user.userId)
+            .subscribe((response: TreeNode) => {
+              // console.log(response);
+              this.directoryTree = response;
+            }, (error) => {
+              console.log(error);
+            }, () => {
+              this.reloadNavigation();
+            });
         }
       });
   }
@@ -73,7 +84,7 @@ export class DriveComponent implements OnInit {
   getDirectoryTree() {
     this.driveService.getDirectoryTree(this.adminService.user.userId)
       .subscribe((response: TreeNode) => {
-        console.log(response);
+        // console.log(response);
         this.directoryTree = response;
       }, (error) => {
         console.log(error);
@@ -98,7 +109,53 @@ export class DriveComponent implements OnInit {
             this.fileTypes.DIRECTORY) : null,
         }
       }) : [];
-    console.log(this.currentDirectoryFiles);
+    // console.log(this.currentDirectoryFiles);
+  }
+
+  // reload 
+  reloadNavigation() {
+    let newNav: TreeNode[] = [];
+    for (let i = 0; i < this.navigationDirs.length; i++) {
+      // console.log('currently on', this.navigationDirs[i]);
+      this.traverseTree(this.directoryTree, this.navigationDirs[i].path, newNav);
+    }
+    // console.log(newNav);
+    this.navigationDirs = [];
+    this.navigationDirs = newNav;
+    this.loadCurrentDirectory();
+  }
+
+  /**
+   * Method finds TreeNode with
+   * path === dirPath and appends to newNav
+   * @param node TreeNode
+   * @param dirPath path to search
+   * @param newNav TreeNode[] navigationArr
+   * @returns null;
+   */
+  traverseTree(node: TreeNode, dirPath: string, newNav: TreeNode[]) {
+    let searchDirName = dirPath.split("/")[dirPath.split("/").length - 1];
+    let rootName = node.path.split("/")[node.path.split("/").length - 1];
+    if (rootName === searchDirName) {
+      // console.log('found', node);
+      newNav.findIndex(d => d.path.split('/')[d.path.split("/").length - 1] === rootName) < 0 ?
+        newNav.push(node) : null;
+    }
+
+    for (let i = 0; i < node.children.length; i++) {
+      // console.log(i);
+      let childName = node.children[i].path.split("/")[node.children[i].path.split("/").length - 1];
+      if (childName === searchDirName) {
+        // console.log('found', node.children[i]);
+        newNav.findIndex(d => d.path.split('/')[d.path.split("/").length - 1] === childName) < 0 ?
+          newNav.push(node.children[i]) : null;
+      }
+
+      if (node.children[i].children.length > 0) {
+        // console.log('has child', i, node.children[i].children);
+        this.traverseTree(node.children[i], dirPath, newNav);
+      }
+    }
   }
 
   selectFile(file: DriveFile) {
@@ -109,9 +166,9 @@ export class DriveComponent implements OnInit {
   selectFolder(file: DriveFile) {
     let idx = this.navigationDirs[this.navigationDirs.length - 1].children
       .findIndex(dir => dir.file.name === file.name);
-    console.log(idx);
+    // console.log(idx);
     this.navigationDirs.push(this.navigationDirs[this.navigationDirs.length - 1].children[idx]);
-    console.log(this.navigationDirs);
+    // console.log(this.navigationDirs);
     this.loadCurrentDirectory();
   }
 

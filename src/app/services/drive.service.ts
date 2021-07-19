@@ -15,6 +15,10 @@ export class DriveService {
   uploadCompleteObsrv: Observable<File> = this.uploadComplete.asObservable();
   notifyUploadComplete: Subject<boolean> = new Subject();
   notifyUploadCompleteObsrv: Observable<boolean> = this.notifyUploadComplete.asObservable();
+  downloadProgress: Subject<DownloadProgress> = new Subject();
+  downloadProgressObsrv: Observable<DownloadProgress> = this.downloadProgress.asObservable();
+  downloadResponse: Subject<any> = new Subject();
+  downloadResponseObsrv: Observable<any> = this.downloadResponse.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -31,7 +35,7 @@ export class DriveService {
       this.uploadProgress.next({ fileName: f.name, progress: percent });
     }
     let uploadComplete = (response: UploadResponse) => {
-      console.log(response);
+      // console.log(response);
       this.uploadComplete.next(f);
     }
 
@@ -50,7 +54,37 @@ export class DriveService {
   }
 
   downloadFile(payload) {
-    // TODO
+    let startTime = new Date().getTime();
+
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.open('POST', this.driveUrl + 'file/download');
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify(payload));
+
+    let downloadProgress = (data: DownloadProgress) => {
+      this.downloadProgress.next(data);
+    }
+    let downloadComplete = (response: any) => {
+      this.downloadResponse.next(response);
+    }
+
+    xhr.onprogress = function (e) {
+      let duration = (new Date().getTime() - startTime) / 1000;
+      let bps = e.loaded / duration;
+      let kbps = Math.floor(bps / 1024);
+      let time = (e.total - e.loaded) / bps;
+      let secs = Math.floor(time % 60);
+      let mins = Math.floor(time / 60);
+      let percent = Math.floor((e.loaded / e.total) * 100);
+      downloadProgress({ percent, kbps, secs, mins });
+    }
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        downloadComplete(xhr.response);
+      }
+    }
   }
 
   renameFile(payload) {
@@ -123,6 +157,13 @@ export interface DriveFile {
 export interface UploadProgress {
   fileName: string,
   progress: number
+}
+
+export interface DownloadProgress {
+  percent: number,
+  kbps: number,
+  secs: number,
+  mins: number
 }
 
 export interface UploadResponse {

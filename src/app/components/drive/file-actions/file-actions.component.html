@@ -1,14 +1,16 @@
 <div class="file-actions-page--container">
     <div class="file-actions-page--wrapper">
+        <!-- action -->
         <div class="mat-headline">
             {{ data.fileAction===fileActions.add_file ? 'Upload Files':
             data.fileAction===fileActions.add_directory ? 'Add Folder' :
             data.fileAction===fileActions.delete_directory ? 'Confirmation' :
             data.fileAction===fileActions.rename_file ? 'Rename File' :
             data.fileAction===fileActions.rename_directory ? 'Rename Folder' :
-            data.fileAction===fileActions.download_file ? 'Download File' :
+            data.fileAction===fileActions.download_file ? 'Downloading File' :
             data.fileAction===fileActions.delete_file ? 'Confirmation' : '' }}
         </div>
+        <!-- add file -->
         <div *ngIf="data.fileAction===fileActions.add_file" class="file-actions-page--toolbar">
             <div class="file-actions-page--toolbar-info">
                 <div class="mat-subheading-2">
@@ -20,13 +22,10 @@
                 <label *ngIf="!isUploading" for="file-select">Select Files</label>
                 <input hidden id="file-select" name="file-select" type="file" multiple>
             </div>
-            <!-- <div *ngIf="data.fileAction===fileActions.add_file" class="file-actions-page--toolbar-progress">
-                <div class="file-actions-page--toolbar-progress-bar">
-                    <div id="upload-progress-bar-fill" class="file-actions-page--toolbar-progress-bar-fill"></div>
-                </div>
-            </div> -->
         </div>
+        <!-- error -->
         <mat-error *ngIf="error">{{ error }}</mat-error>
+        <!-- add directory -->
         <div *ngIf="data.fileAction===fileActions.add_directory" class="file-actions-page--list-wrapper">
             <mat-form-field>
                 <mat-label>Folder Name</mat-label>
@@ -34,6 +33,7 @@
                 <mat-error *ngIf="addFolderInput.invalid">Name is required</mat-error>
             </mat-form-field>
         </div>
+        <!-- rename -->
         <div *ngIf="data.fileAction===fileActions.rename_file||data.fileAction===fileActions.rename_directory"
             class="file-actions-page--list-wrapper">
             <mat-form-field>
@@ -42,18 +42,32 @@
                 <mat-error *ngIf="renameInput.invalid">Name is required</mat-error>
             </mat-form-field>
         </div>
+        <!-- delete file -->
         <div *ngIf="data.fileAction===fileActions.delete_file" class="file-actions-page--list-wrapper">
             <div class="mat-subheading-2">
                 Delete <b>'{{ data.data.currentlySelectedFile.name }}'</b> ?
             </div>
         </div>
+        <!-- delete folder -->
         <div *ngIf="data.fileAction===fileActions.delete_directory" class="file-actions-page--list-wrapper">
             <div class="mat-subheading-2">
                 Delete <b>'{{ data.data.currentlySelectedFolder.name }}'</b> ?
                 All the files in this folder will alse be removed.
             </div>
         </div>
+        <!-- download file -->
+        <div *ngIf="data.fileAction===fileActions.download_file" class="file-actions-page--list-wrapper">
+            <div class="file-actions-page--list">
+                <div id="upload-progress-bar-detail" class="mat-small"></div>
+                <div class="file-actions-page--list-progress">
+                    <div class="file-actions-page--list-progress-bar">
+                        <div id="upload-progress-bar-fill" class="file-actions-page--list-progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <mat-divider></mat-divider>
+        <!-- upload list -->
         <div *ngIf="data.fileAction===fileActions.add_file && fileSelected.length>0"
             class="file-actions-page--list-wrapper">
             <div class="file-actions-page--list">
@@ -69,7 +83,8 @@
                 </ul>
             </div>
         </div>
-        <div *ngIf="!isUploading" class="file-actions-page--actions">
+        <!-- action buttons -->
+        <div *ngIf="!isUploading&&!isDownloading" class="file-actions-page--actions">
             <div fxFlex></div>
             <button *ngIf="data.fileAction===fileActions.add_file" [disabled]="fileSelected.length===0"
                 (click)="uploadFiles()" mat-stroked-button>Upload</button>

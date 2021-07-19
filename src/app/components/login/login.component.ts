@@ -25,11 +25,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void { }
 
   login() {
-    console.log(this.loginForm.value);
+    // console.log(this.loginForm.value);
 
     this.adminService.login(this.loginForm.value)
       .subscribe((response: any) => {
-        console.log(response);
+        // console.log(response);
         this.adminService.user = response.user;
         localStorage.setItem('token', response.token);
       }, (error) => {
